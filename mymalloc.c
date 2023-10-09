@@ -118,7 +118,7 @@ meta_data * join(meta_data * p) {
         return left;
     }
     if(right != NULL && left == NULL) {
-        p -> size += (left -> size) + (sizeof(meta_data));
+        p -> size += (right -> size) + (sizeof(meta_data));
         p -> next = right -> next;
         return p;
     }
