@@ -49,17 +49,17 @@ void test0() {
     print_mem();
     
     printf("********************************\n");
-    printf("Freeing first allocated pointer\n");
+    printf("Freeing third allocated pointer\n");
     printf("********************************\n");
 
-    free(p);
+    free(p3);
 
     print_mem();
 
     printf("********************************\n");
-    printf("Freeing third allocated pointer\n");
+    printf("Freeing first allocated pointer\n");
     printf("********************************\n");
-    free(p3);
+    free(p);
     print_mem();
 }
 
@@ -71,5 +71,5 @@ void testa() {
     print_mem();
 }
 int main() {
-    testa();
+    test0();
 }
