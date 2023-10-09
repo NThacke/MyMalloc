@@ -27,7 +27,7 @@ static meta_data * EOM = (meta_data *)(memory + MEMLENGTH);
 void init() {
     meta_data data;
     data.usage = FREE;  
-    data.size = MEMLENGTH - sizeof(meta_data);
+    data.size = (MEMLENGTH * sizeof(double) - sizeof(meta_data));
     data.next = NULL;
     *((meta_data *)(memory)) = data;
 }
@@ -67,9 +67,9 @@ void *mymalloc(size_t size, char *file, int line) {
         new_data.usage = FREE;
         new_data.next = NULL;
         
-        double * data_address = ((double *)(data) + sizeof(meta_data) + size); //address we will put the new struct at in the memory
+        char * data_address = ((char *)(data) + sizeof(meta_data) + size); //address we will put the new struct at in the memory
         printf("Found next meta data address at address %p\n", data_address);
-        new_data.size = (double *)(EOM) - (data_address + sizeof(meta_data));
+        new_data.size = (char *)(EOM) - (data_address + sizeof(meta_data));
         *( (meta_data *) data_address) = new_data;
 
         printf("Size is %d\n", new_data.size);
@@ -78,9 +78,72 @@ void *mymalloc(size_t size, char *file, int line) {
     }
     data -> usage = USED;
     data -> size = size;
-    return data;
+    return ((char *)(data) + sizeof(meta_data));
     }
     return NULL;
+}
+
+meta_data * find_left(meta_data * p) {
+    meta_data * current = SOM;
+    while(current != p) {
+        if(current -> usage == FREE && current -> next == p) {
+            return current;
+        }
+        current = current -> next;
+    }
+    return NULL;
+}
+meta_data * find_right(meta_data * p) {
+    meta_data * next = p -> next;
+    if(next != NULL && next -> usage == FREE) {
+        return next;
+    }
+    return NULL;
+}
+/**
+ * Joins the given META POINTER to adjcently free chunks and returns the META DATA address of the joined chunks.
+*/
+meta_data * join(meta_data * p) {
+    meta_data * right = find_right(p);
+    meta_data * left = find_left(p);
+
+    if(right == NULL && left != NULL) {
+        left -> size += (p -> size) + (sizeof(meta_data));
+        left -> next = p -> next;
+        return left;
+    }
+    if(right != NULL && left == NULL) {
+        p -> size += (left -> size) + (sizeof(meta_data));
+        p -> next = right -> next;
+        return p;
+    }
+    if(right != NULL && left != NULL) {
+        left -> size += (right->size) + (p->size) + (2*sizeof(meta_data));
+        left -> next = right -> next;
+        return left;
+    }
+    return p; //no left/right adjacently free
+
+}
+void myfree(void *p, char *file, int line) {
+    meta_data * current = SOM;
+    while(current != NULL) {
+        printf("On meta chunk %p\n", current);
+        printf("Checking if %p is the pointer\n", (void *)(current) + sizeof(meta_data));
+        void * check = ((void *)(current) + sizeof(meta_data));
+        if(check == p) { //we found our pointer!
+            if(current -> usage == FREE) {
+                printf("free() failed in file '%s' on line '%d' as the pointer %p has already been freed\n", file, line, p);
+            }
+            else {
+                current = join(current); //coelsce p
+                current -> usage = FREE;
+            }
+            return;
+        }
+        current = current -> next;
+    }
+    printf("free() failed in file '%s' on line '%d' as the pointer %p does not point to a piece of allocated memory\n", file, line, p);
 }
 
 void print_mem() {
