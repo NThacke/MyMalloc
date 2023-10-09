@@ -100,5 +100,5 @@ void test4() {
     
 }
 int main() {
-    test0();
+    test2();
 }
