@@ -19,6 +19,12 @@ long long current_microseconds() {
     return microseconds;
 }
 
+void test0() {
+    void * p = malloc(1);
+    print_mem();
+    free(p);
+    print_mem();
+}
 void test1() {
 
     // long long time = 0;
@@ -94,5 +100,5 @@ void test4() {
     
 }
 int main() {
-    test2();
+    test0();
 }
