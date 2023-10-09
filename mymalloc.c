@@ -13,6 +13,8 @@ double static memory [MEMLENGTH];
 #define TRUE 1
 #define FALSE 0
 
+#define TESTING FALSE
+
 
 struct META_DATA { //16 byte size
     struct META_DATA * next; //8bytes
@@ -60,7 +62,9 @@ void *mymalloc(size_t size, char *file, int line) {
         printf("malloc() failed in file '%s' on line '%d'\n", file, line);
         return data;
     }
-    printf("Malloc found an available pointer at address %p\n", data);
+    if(TESTING) {
+        printf("Malloc found an available pointer at address %p\n", data);
+    }
     if(data -> next == NULL) {
         //we found the final chunk
         meta_data new_data;
@@ -68,11 +72,12 @@ void *mymalloc(size_t size, char *file, int line) {
         new_data.next = NULL;
         
         char * data_address = ((char *)(data) + sizeof(meta_data) + size); //address we will put the new struct at in the memory
-        printf("Found next meta data address at address %p\n", data_address);
         new_data.size = (char *)(EOM) - (data_address + sizeof(meta_data));
+        if(TESTING) {
+            printf("Found next meta data address at address %p\n", data_address);
+            printf("Size is %d\n", new_data.size);
+        }
         *( (meta_data *) data_address) = new_data;
-
-        printf("Size is %d\n", new_data.size);
         data -> next = (meta_data *)(data_address);
 
     }
@@ -128,8 +133,10 @@ meta_data * join(meta_data * p) {
 void myfree(void *p, char *file, int line) {
     meta_data * current = SOM;
     while(current != NULL) {
-        printf("On meta chunk %p\n", current);
-        printf("Checking if %p is the pointer\n", (void *)(current) + sizeof(meta_data));
+        if(TESTING) {
+            printf("On meta chunk %p\n", current);
+            printf("Checking if %p is the pointer\n", (void *)(current) + sizeof(meta_data));
+        }
         void * check = ((void *)(current) + sizeof(meta_data));
         if(check == p) { //we found our pointer!
             if(current -> usage == FREE) {
