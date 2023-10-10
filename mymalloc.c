@@ -156,6 +156,8 @@ void myfree(void *p, char *file, int line) {
 void print_mem() {
     meta_data * data = SOM;
     printf("-------------------------\n");
+    printf("SOM : %p\n", SOM);
+    printf("EOM : %p\n", EOM);
     while(data != NULL) {
         printf("On address %p\n", data);
         printf("Usage : %d\n", data -> usage);
@@ -164,5 +166,9 @@ void print_mem() {
         data = data -> next;
     }
     printf("-------------------------\n");
+}
+
+int leak() {
+    return ((char *)(SOM -> size + sizeof(meta_data)) != 8*MEMLENGTH) && SOM -> usage != FREE; //every chunk would be freed, hence, the SOM size would be the entire memory available
 }
 
