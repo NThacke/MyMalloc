@@ -13,7 +13,7 @@ double static memory [MEMLENGTH];
 #define TRUE 1
 #define FALSE 0
 
-#define TESTING FALSE
+#define TESTING TRUE
 
 
 struct META_DATA { //16 byte size
@@ -43,7 +43,7 @@ int final_chunk(meta_data * data) {
 meta_data * find(size_t size) {
     meta_data * data = (meta_data *)(memory);
     while(data != NULL) {
-        if(data -> usage == FREE && data -> size >= size) {
+        if(data -> usage == FREE && (data -> size >= size + sizeof(meta_data))) {
             return data;
         }
         data = data -> next;
@@ -161,8 +161,8 @@ void print_mem() {
     while(data != NULL) {
         printf("On address %p\n", data);
         printf("Usage : %d\n", data -> usage);
-        printf("Size  : %d\n", (int)(data -> size));
-        printf("Moving to address %p \n", data->next);
+        printf("Payload Size  : %d\n", (int)(data -> size));
+        printf("Chunk Size : %d\n\n", (int)(data -> size) + (sizeof(meta_data)));
         data = data -> next;
     }
     printf("-------------------------\n");

@@ -256,18 +256,34 @@ void test5() {
     printf("~---------------------------------------~\n");
 }
 
-void test5() {
+void test6() {
 
-    int arr[200];
-    void * p = malloc(1);
+    // void * arr [256];
+    void * p = malloc(56);
     int i = 0;
     while(p != NULL) {
-        arr[i] = p;
-        p = malloc(1);
+        printf("%d\n", i);
+        p = malloc(56);
         i++;
     }
+    print_mem();
 
-    
+    // int j = 0;
+    // while(j < i) {
+    //     void * p = arr[j];
+    //     *((int *)(p)) = j;
+    //     j++;
+    // }
+
+    // j = 0;
+    // while(j < i) {
+    //     void * p = arr[j];
+    //     printf("Payload : %d\n", *(int *)(p));
+    //     j++;
+    // }
+
+
+
 }
 /**
  * Slowly prints the given text to the terminal.
@@ -293,6 +309,7 @@ void perform(int test) {
         case 3 : test3(); break;
         case 4 : test4(); break;
         case 5 : test5(); break;
+        case 6 : test6(); break;
         default : return;
     }
 }
