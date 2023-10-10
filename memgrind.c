@@ -255,6 +255,20 @@ void test5() {
     print_mem();
     printf("~---------------------------------------~\n");
 }
+
+void test5() {
+
+    int arr[200];
+    void * p = malloc(1);
+    int i = 0;
+    while(p != NULL) {
+        arr[i] = p;
+        p = malloc(1);
+        i++;
+    }
+
+    
+}
 /**
  * Slowly prints the given text to the terminal.
 */

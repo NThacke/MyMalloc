@@ -71,5 +71,5 @@ void testa() {
     print_mem();
 }
 int main() {
-    test0();
+    testa();
 }
