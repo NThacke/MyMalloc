@@ -13,7 +13,7 @@ double static memory [MEMLENGTH];
 #define TRUE 1
 #define FALSE 0
 
-#define TESTING TRUE
+#define TESTING FALSE
 
 
 struct META_DATA { //16 byte size
