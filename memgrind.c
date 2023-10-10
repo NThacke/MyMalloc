@@ -14,6 +14,9 @@
 
 #define END_PROGRAM 0
 
+#define TRUE 1
+#define FALSE 0
+
 /**
  * Returns the number of microseconds since EPOCH time.
 */
@@ -157,6 +160,11 @@ void test3() {
  * Then, randomly frees the allocated pointers. This is a test of coelscence.
 */
 void test4() {
+
+    printf("~---------------------------------------~\n");
+    printf("|               Test Four               |\n");
+    printf("|---------------------------------------|\n");
+
     void * arr [128]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
     void * p = malloc(24);
     int i = 0;
@@ -166,29 +174,86 @@ void test4() {
         i++;
     }
     print_mem();
-
-    // int j = 0;
-    // void * q = arr[j];
-    // while(q != NULL) {
-    //     free(q);
-    //     j++;
-    //     q = arr[j];
-    // }
-    for(int j = 0; j<128; j++) {
-        int random = rand();
-        random = random%128;
-        printf("The index is %d\n", random);
-        void * choice = arr[random];
-        while(choice == NULL) { //every iteration is guaranteed to free some pointer
-            random++;
-            choice = arr[random];
-        }
-        free(choice);
-        arr[random] = NULL;
+    i--; 
+    while(i >= 0) { //frees all of the allocated pointers
+        free(arr[i]);
+        i--;
     }
     print_mem();
+    printf("~---------------------------------------~\n");
     
-    
+}
+void swap(int * arr, int i, int j) {
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+int unique(int * arr, int size) {
+    for(int i = 0; i<size; i++){
+        for(int j = i+1; j<size; j++) {
+            if(arr[i] == arr[j]) {
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
+}
+void generate(int arr[], int size) {
+    for(int i = 0; i<size; i++) {
+        arr[i] = i;
+    }
+    print(arr, size);
+    if(unique(arr, size)) {
+        printf("Generated set is unique\n");
+    }
+    else {
+        printf("Generated set is not unique\n");
+    }
+    //shuffle the array to randomize it
+    for(int i = 0; i<size; i++) {
+        int random1 = rand()%size;
+        int random2 = rand()%size;
+        swap(arr, random1, random2);
+    }
+    print(arr, size);
+
+    if(unique(arr, size)) {
+        printf("Generated set is unique\n");
+    }
+    else {
+        printf("Generated set is not unique\n");
+    }
+} 
+void print(int * arr, int size) {
+    for(int i = 0; i<size; i++) {
+        printf("%d\t", arr[i]);
+    }
+    printf("\n");
+}
+void test5() {
+    printf("~---------------------------------------~\n");
+    printf("|               Test Five               |\n");
+    printf("|---------------------------------------|\n");
+
+    void * arr [128]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
+    void * p = malloc(24);
+    int i = 0;
+    while(p != NULL) {
+        arr[i] = p;
+        p = malloc(24);
+        i++;
+    }
+    print_mem();
+    int random [128]; //have a random set of 128 numbers
+    generate(random, 128);
+    print(random, 128);
+    for(int j = 0; j<128; j++) {
+        void * p = arr[random[j]];
+        free(p);
+    }
+
+    print_mem();
+    printf("~---------------------------------------~\n");
 }
 /**
  * Slowly prints the given text to the terminal.
@@ -212,6 +277,8 @@ void perform(int test) {
         case 1 : test1(); break;
         case 2 : test2(); break;
         case 3 : test3(); break;
+        case 4 : test4(); break;
+        case 5 : test5(); break;
         default : return;
     }
 }
@@ -222,6 +289,7 @@ int choose() {
     slowprint("*Test (1) : malloc() and immediately free() a 1-byte object, 120 times\n\n");
     slowprint("*Test (2) : Use malloc() to get 120 1-byte objects, storing the pointers in an array, then use free() to deallocate the chunks\n\n");
     slowprint("*Test (3) : Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects\n\n");
+    slowprint("*Test (4) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
     slowprint("*Exit (0) : Exit the program\n\n");
     slowprint("*Enter a number [0,3] :");
     scanf("%d", &choice);
