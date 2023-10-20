@@ -155,11 +155,62 @@ void test3() {
     
 }
 
+/** 
+ * Test four: General stress test of malloc/free
+ * Step 1: Generate random payload size
+ * Step 2: Allocate block
+ * Step 3 free
+ * Step 4: Repeat this 50 times
+*/
+
+void test4() {
+    printf("\n\n+---------------------------------------+\n");
+    printf("|               Test Four               |\n");
+    printf("+---------------------------------------+\n\n\n");
+
+
+    // Start of iterations
+    srand(time(NULL));
+
+    // Start timer
+    long long total_test_time = 0;
+    for (int x = 0; x < 50; x++) {
+        // Start iteration timer
+        long long iteration_start = current_microseconds();
+        // Step 1: Generate random payload size
+        
+        // print message 
+        printf("Iteration %d of 50\n", x+1);
+
+        // Note: We use srand here because we are not feeding into an array
+        // To generate range: rand() % (max_number + 1 - minimum_number) + minimum_number
+        int payload_size = rand() % (4064 + 1 - 1) + 1;
+        printf("Payload size: %d\n", payload_size);
+
+        // malloc and free immediately
+        void * p = malloc(payload_size);
+        free(p);
+
+        // report timer
+        long long iteration_end = current_microseconds();
+        printf("Iteration time: %.2lf microseconds\n\n", (double)(iteration_end - iteration_start));
+        // add to total timer
+        total_test_time += (iteration_end - iteration_start);
+    }
+
+    printf("Test time: %.2lf microseconds\n", (double)(total_test_time));
+    printf("Avg itme: %.2lf microseconds\n\n", (double)(total_test_time/50));
+    printf("---------------------------------------\n\n\n");
+
+}
+
 /**
  * Allocates 16 bytes of memory until malloc() fails.
  * Then, randomly frees the allocated pointers. This is a test of coelscence.
-*/
-void test4() {
+ * We are skipping this performance test for now. dco43 has renamed the test for this
+
+
+void testCoelscence() {
 
     printf("~---------------------------------------~\n");
     printf("|               Test Four               |\n");
@@ -183,6 +234,47 @@ void test4() {
     printf("~---------------------------------------~\n");
     
 }
+*/
+
+
+
+
+
+/**
+ * Test five: Performance testing of free(). 
+ * Generate 128 chunks and fill up memory
+ * Generate array with 128 random numbers (this corresponds to index)
+ * call free() and free on random index generated in previous step
+*/
+
+void test5() {
+    printf("~---------------------------------------~\n");
+    printf("|               Test Five               |\n");
+    printf("|---------------------------------------|\n");
+
+    void * arr [128]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
+    void * p = malloc(24);
+    int i = 0;
+    while(p != NULL) {
+        arr[i] = p;
+        p = malloc(24);
+        i++;
+    }
+    print_mem();
+    int random [128]; //have a random set of 128 numbers
+    generate(random, 128);
+    print(random, 128);
+    for(int j = 0; j<128; j++) {
+        void * p = arr[random[j]];
+        free(p);
+    }
+
+    print_mem();
+    printf("~---------------------------------------~\n");
+}
+
+
+
 void swap(int * arr, int i, int j) {
     int temp = arr[i];
     arr[i] = arr[j];
@@ -230,43 +322,25 @@ void print(int * arr, int size) {
     }
     printf("\n");
 }
-void test5() {
-    printf("~---------------------------------------~\n");
-    printf("|               Test Five               |\n");
-    printf("|---------------------------------------|\n");
 
-    void * arr [128]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
-    void * p = malloc(24);
-    int i = 0;
-    while(p != NULL) {
-        arr[i] = p;
-        p = malloc(24);
-        i++;
-    }
-    print_mem();
-    int random [128]; //have a random set of 128 numbers
-    generate(random, 128);
-    print(random, 128);
-    for(int j = 0; j<128; j++) {
-        void * p = arr[random[j]];
-        free(p);
-    }
 
-    print_mem();
-    printf("~---------------------------------------~\n");
-}
 
-void test6() {
 
-    // void * arr [256];
-    void * p = malloc(56);
-    int i = 0;
-    while(p != NULL) {
-        printf("%d\n", i);
-        p = malloc(56);
-        i++;
-    }
-    print_mem();
+
+
+
+
+// void test6() {
+
+//     // void * arr [256];
+//     void * p = malloc(56);
+//     int i = 0;
+//     while(p != NULL) {
+//         printf("%d\n", i);
+//         p = malloc(56);
+//         i++;
+//     }
+//     print_mem();
 
     // int j = 0;
     // while(j < i) {
@@ -284,7 +358,7 @@ void test6() {
 
 
 
-}
+// }
 /**
  * Slowly prints the given text to the terminal.
 */
@@ -309,7 +383,7 @@ void perform(int test) {
         case 3 : test3(); break;
         case 4 : test4(); break;
         case 5 : test5(); break;
-        case 6 : test6(); break;
+        // case 6 : test6(); break;
         default : return;
     }
 }
@@ -320,7 +394,8 @@ int choose() {
     slowprint("*Test (1) : malloc() and immediately free() a 1-byte object, 120 times\n\n");
     slowprint("*Test (2) : Use malloc() to get 120 1-byte objects, storing the pointers in an array, then use free() to deallocate the chunks\n\n");
     slowprint("*Test (3) : Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects\n\n");
-    slowprint("*Test (4) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
+    slowprint("*Test (4) : Generate random number of pointers, allocate array and store, shuffle array, free().\n");
+    slowprint("*Test (5) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
     slowprint("*Exit (0) : Exit the program\n\n");
     slowprint("*Enter a number [0,3] :");
     scanf("%d", &choice);
