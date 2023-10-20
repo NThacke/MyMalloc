@@ -76,6 +76,57 @@ void test2() {
     printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
     printf("~---------------------------------------~\n");
 }
+
+/**
+ * Allocates a 1 byte object and stores the pointer to it at arr[index]
+ * 
+ * If successful, returns (index+1);
+ * If unsuccessful, returns index.
+ * 
+ * Note that this method is only unssuccesful if index < 0 || index >= 120
+*/
+int alloc(void ** arr, int index, int * allocations) {
+    if(index >= 0 && index < 120) {
+        void * p = malloc(1);
+        arr[index] = p;
+        index++;
+        (*(allocations))++;
+    }
+    return index;
+}
+
+/**
+ * Deallocates the pointer located at arr[index].
+ * 
+ * If arr[index] can not be deallocated (it has either already been deallocated or not allocated -- the latter being only if dealloc() is invoked prior to alloc()),
+ * this method will return the current index.
+ * 
+ * If the given index is -1, that is, dealloc() was invoked prior to alloc, this method will not free anything and return 0.
+*/
+int dealloc(void ** arr, int index) {
+    if(index >= 0 && index < 120 && arr[index] != NULL) {
+        void * p = arr[index];
+        free(p);
+        arr[index] = NULL;
+    }
+    if(index < 0) {
+        return 0;
+    }
+    if(index > 120) {
+        return 120;
+    }
+    return index;
+}
+
+void dealloc_cheap(void ** arr, int index) {
+    for(int i = 0; i<index; i++) {
+        void * p = arr[i];
+        if(p != NULL) {
+            free(p);
+            arr[i] = NULL;
+        }
+    }
+}
 /**
  * Allocates arr[index] with a newly allocated pointer.
  * 
@@ -109,7 +160,29 @@ int deallocate(void ** arr, int index) {
 */
 void nullify(void ** arr, int size) {
     for(int i = 0; i<size; i++) {
-        arr[size] = NULL;
+        arr[i] = NULL;
+    }
+}
+void test_3() {
+    printf("Performing test3\n");
+    void * arr[120];
+    nullify(arr, 120);
+    int allocations = 0;
+    int index = 0;
+    while(allocations < 120) { //Note that index is the index to be allocated, that is, it is guaranteed to store a NULL pointer.
+        int random = rand()%2;
+        if(random == 0) {
+            index = alloc(arr, index, &allocations);
+        }
+        else {
+            index = dealloc(arr, index-1);
+        }
+    }
+    for(int i = 0; i<120; i++) { //frees everything that isn't already freed
+        void * p = arr[i];
+        if(p != NULL) {
+            free(p);
+        }
     }
 }
 void test3() {
@@ -430,7 +503,7 @@ void perform(int test) {
     switch(test) {
         case 1 : test1(); break;
         case 2 : test2(); break;
-        case 3 : test3(); break;
+        case 3 : test_3(); break;
         case 4 : test4(); break;
         case 5 : test5(); break;
         case 6 : test6(); break;
