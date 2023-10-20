@@ -1,0 +1,24 @@
+Readme
+
+Userinfo:
+
+dco43 - David Ontiveros
+
+Procedure to run code:
+
+tar -xf p1.tar
+make
+./memgrind
+
+
+Library information: 
+
+This library implements a custom malloc/free implementation that allocates the following data structure:
+
+  ┌──────────────┬────────────────────────────────┐
+  │   METADATA   │            PAYLOAD             │
+  └──────────────┴────────────────────────────────┘
+
+Test information:
+
+
