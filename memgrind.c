@@ -135,7 +135,9 @@ void test3() {
             }
         }
         while(index >= 0) {
-            free(arr[index]);
+            if(arr[index] != NULL) {
+                free(arr[index]);
+            }
             index--;
         }
         long long end = current_microseconds();
@@ -323,42 +325,90 @@ void print(int * arr, int size) {
     printf("\n");
 }
 
+/**
+ * This test is a correctness test.
+ * 
+ * This method will allocate 120 1 byte pointers, and populate the payload with an integer.
+ * 
+ * Then, this method will iterate over the pointers, ensuring that each payload contains the correct data.
+ * 
+ * 
+*/
+void test6() {
+    printf("----------------------------\n");
+    printf("|         Test Six          |\n");
+    printf("----------------------------\n");
+    
+    long long time = 0;
+    for(int j = 0; j<50; j++) {
+        void * arr [120];
 
+        long long start = current_microseconds();
+        for(int i = 0; i<120; i++) {
+            void * p = malloc(1);
+            arr[i] = p;
+            
+            //populate the payload
+            *(int *)(p) = i; //the ith pointer contains a payload of i
+        }
 
+        //ensure that each pointer contains the correct data
+        for(int i = 0; i<120; i++) {
+            void * p = arr[i];
+            if( *(int *)(p) != i) {
+                //this is bad, we are overwrite some data!
+                printf("Test6 failed, overwrote data!\n");
+                return;
+            }
+        }
+        for(int i = 0; i<120; i++) {
+            free(arr[i]);
+        }
+        long long end = current_microseconds();
+        time += (end-start);
+    }
+    printf("Test 6 was successful, no data had been overwritten!\n");
+    printf("|Total time   : %.2lf microseconds     |\n", (double)time);
+    printf("|Average time : %.2lf microseconds       |\n", (double)(time)/50);
+    printf("~---------------------------------------~\n");
 
+}
+/**
+ * Allocates 120 pointers and tests to see if any of the pointers overlap / are the same pointer. This is a test of malloc() to see if malloc() successfully returns unique pointers (other than NULL).
+*/
+void test7() {
 
+    long long time = 0;
+    for(int j = 0; j<50; j++) {
+        void * arr[120];
+        long long start = current_microseconds();
+        for(int i = 0; i<120; i++) {
+            void * p = malloc(1);
+            arr[i] = p;
+        }
 
+        //O(n^2) test to see if duplicates. O(n) exists and requires hashmap implementation. This is unneccesary for our purposes here.
 
+        for(int i = 0; i<120; i++) {
+            void * p = arr[i];
+            for(int k = i+1; k<120; k++) {
+                void * q = arr[k];
+                if(p == q) {
+                    printf("Test (7) failed. Pointer %p and pointer %p point to the same payload but are different allocations\n.", p, q);
+                    return;
+                }
+            }
+            free(p); //we can free p, we won't check this pointer again (as it has been tested against all other pointers)
+        }
 
-// void test6() {
-
-//     // void * arr [256];
-//     void * p = malloc(56);
-//     int i = 0;
-//     while(p != NULL) {
-//         printf("%d\n", i);
-//         p = malloc(56);
-//         i++;
-//     }
-//     print_mem();
-
-    // int j = 0;
-    // while(j < i) {
-    //     void * p = arr[j];
-    //     *((int *)(p)) = j;
-    //     j++;
-    // }
-
-    // j = 0;
-    // while(j < i) {
-    //     void * p = arr[j];
-    //     printf("Payload : %d\n", *(int *)(p));
-    //     j++;
-    // }
-
-
-
-// }
+        long long end = current_microseconds();
+        time += (end-start);
+    }
+    printf("Test 7 was successful, no pointers had been malloced more than once.\n");
+    printf("|Total time   : %.2lf microseconds     |\n", (double)time);
+    printf("|Average time : %.2lf microseconds       |\n", (double)(time)/50);
+    printf("~---------------------------------------~\n");
+}
 /**
  * Slowly prints the given text to the terminal.
 */
@@ -383,7 +433,8 @@ void perform(int test) {
         case 3 : test3(); break;
         case 4 : test4(); break;
         case 5 : test5(); break;
-        // case 6 : test6(); break;
+        case 6 : test6(); break;
+        case 7 : test7(); break;
         default : return;
     }
 }
@@ -396,8 +447,11 @@ int choose() {
     slowprint("*Test (3) : Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects\n\n");
     slowprint("*Test (4) : Generate random number of pointers, allocate array and store, shuffle array, free().\n");
     slowprint("*Test (5) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
+    slowprint("*Test (6) : Allocate 120 1-byte pointers, writing to the payload some data. Then, iterates over the pointers ensuring that the data contains the same data as stored. If an overwrite occurs, this method halts and notifies as such.\n");
+    slowprint("*Test (7) : Allocates 120 pointers and ensures that each pointer is a unique pointer (no duplicates). This is a test to ensure malloc() returns unique pointers.\n");
+
     slowprint("*Exit (0) : Exit the program\n\n");
-    slowprint("*Enter a number [0,3] :");
+    slowprint("*Enter a number [0,6] :");
     scanf("%d", &choice);
     return choice;
 
