@@ -164,26 +164,39 @@ void nullify(void ** arr, int size) {
     }
 }
 void test_3() {
-    printf("Performing test3\n");
-    void * arr[120];
-    nullify(arr, 120);
-    int allocations = 0;
-    int index = 0;
-    while(allocations < 120) { //Note that index is the index to be allocated, that is, it is guaranteed to store a NULL pointer.
-        int random = rand()%2;
-        if(random == 0) {
-            index = alloc(arr, index, &allocations);
+    printf("+---------------------------------------+\n");
+    printf("|               Test Three              |\n");
+    printf("+---------------------------------------+\n");
+
+    long long time = 0;
+    for(int i = 0; i<50; i++) {
+        void * arr[120];
+        nullify(arr, 120);
+        int allocations = 0;
+        int index = 0;
+        long long start = current_microseconds();
+        while(allocations < 120) { //Note that index is the index to be allocated, that is, it is guaranteed to store a NULL pointer.
+            int random = rand()%2;
+            if(random == 0) {
+                index = alloc(arr, index, &allocations);
+            }
+            else {
+                index = dealloc(arr, index-1);
+            }
         }
-        else {
-            index = dealloc(arr, index-1);
+        for(int i = 0; i<120; i++) { //frees everything that isn't already freed
+            void * p = arr[i];
+            if(p != NULL) {
+                free(p);
+            }
         }
+        long long end = current_microseconds();
+        time += (end-start);
     }
-    for(int i = 0; i<120; i++) { //frees everything that isn't already freed
-        void * p = arr[i];
-        if(p != NULL) {
-            free(p);
-        }
-    }
+    printf("|Total time   : %.2lf microseconds     |\n", (double)time);
+    printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
+    printf("+---------------------------------------+\n");
+
 }
 void test3() {
     void * arr [120];
