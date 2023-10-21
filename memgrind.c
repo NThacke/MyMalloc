@@ -297,7 +297,6 @@ void print(int * arr, int size) {
  * 
  * Then, this method will iterate over the pointers, ensuring that each payload contains the correct data.
  * 
- * 
 */
 void test6() {
     printf("----------------------------\n");
