@@ -422,7 +422,7 @@ int choose() {
 }
 int main() {
     printf("~---------------------------------------------------------------------------~\n");
-    slowprint("Welcome to memgrind, the perfect place to test memory allocation functions!\n\n\n\n\n");
+    printf("Welcome to memgrind, the perfect place to test memory allocation functions!\n\n\n\n\n");
 
     int choice = choose();
     while(choice != END_PROGRAM) {
