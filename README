@@ -10,15 +10,79 @@ tar -xf p1.tar
 make
 ./memgrind
 
+----------------------------------------------------------------------------
+Library Information
+----------------------------------------------------------------------------
 
-Library information: 
+This library implements a custom malloc/free implementation. This follows the standard paradigm of having a meta-block followed by a payload block.
 
-This library implements a custom malloc/free implementation that allocates the following data structure:
+**META DATA**
 
-  ┌──────────────┬────────────────────────────────┐
-  │   METADATA   │            PAYLOAD             │
-  └──────────────┴────────────────────────────────┘
+ Each meta data is 16 bytes long. This is due to the fact that meta data blocks contains three pieces of information :
 
-Test information:
+ 1) Usage                  (1 byte )
+ 2) Chunk Size             (4 bytes)
+ 3) Next Meta Data Pointer (8 bytes)
 
+ Usage and chunk size are essential in order to perform operations on this library. However, holding onto the next meta data is not required for an implementation. However, we chose to include such.
+
+ We included the next meta data pointer within the meta data block as it leads to "easier" code. Specifically, the usage of this results in less usage of pointer arithmetic, which in turn typically results in cleaner/easier code to read/write.
+
+ It is worth noting that an attempt was made to use pointer arithmetic rather than next meta data pointers, but the aforementioned issues arose and we decided that the best implementation for our purposes would be to include the next meta data.
+
+ Indeed, a true implementation of malloc() would not store the next meta data block, as that is a large waste in memory as malloc() invocations grow.
+
+**PAYLOAD DATA**
+  
+  The payload data is simply the data that contains the client's data. This is indeed the pointer that malloc() returns, rather than the meta pointer. This ensures that the user can simply derefence their given pointer and store whatever data they want into the payload.
+
+
+**TAIL META DATA**
+
+Contrary to standard paradigms, this library ensures that there will always be a meta-block at the beginning //and// at the tail-end of the memory array.
+
+Prior to any invocation of malloc(), the memory block will be uninitliazed, as such, it will contain undefiend data.
+
+Once malloc() has been invocated at least once, the memory block would then look as :
+
+┌──────────────┬────────────────────────────────┬──────────┐
+│   METADATA   │            PAYLOAD             │ METADATA │
+└──────────────┴────────────────────────────────┴──────────┘
+
+The reason for the meta block being at the tail end is to have an easier implementation. It is easiest to append a meta data block at the end of every malloc request.
+
+This tradeoff has been made because a meta data block contains only 16 bytes. In the grand scheme of things, this does not cause much of an issue, as most machines contains gigabytes of memory.
+
+This leads to the consequence that the largest successful allocation request is indeed 4064 bytes, rather than the expected 4080. There must be a meta block at the beginning and tail end, and each meta block is 16 bytes. As such, the largest successful request is 4064 bytes.
+
+
+----------------------------------------------------------------------------
+Test Information
+----------------------------------------------------------------------------
+
+Test (1)
+  
+  Malloc() and immediately free() a 1-byte object, 120 times
+
+Test (2)
+  
+  Use malloc() to get 120 1-byte objects, storing the pointers in an array, then use free() to deallocate the chunks
+
+Test (3)
+
+  Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects
+
+Test (4)
+
+  Generate random number of pointers, allocate array and store, shuffle array, free().
+
+Test (5)
+
+  Allocates and stores allocated pointers until malloc() fails, that is that all of memory has been consumed (allocates 16 bytes consistently -- memory will run out after 127 invocations). 
+ 
+  Once alocation has completed, this method will then randomly deallocate/free pointers. Thus, this is a perforamnce test of free().
+
+  *Malloc() fails after 127 invocations of 16 bytes (with a memory bank of 4096 bytes) as this library ensures that there is always a meta-block at the tail end of the memory array. As such, only 127 chunks of 16 bytes can be allocated.
+
+  *This also implies that the largest allocation request is 4064. A request of 4080 would be denied, as doing so would leave the tail end to be a non-meta block. The library forbids this.
 
