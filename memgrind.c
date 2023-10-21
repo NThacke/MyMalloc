@@ -533,7 +533,7 @@ int choose() {
     slowprint("*Test (1) : malloc() and immediately free() a 1-byte object, 120 times\n\n");
     slowprint("*Test (2) : Use malloc() to get 120 1-byte objects, storing the pointers in an array, then use free() to deallocate the chunks\n\n");
     slowprint("*Test (3) : Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects\n\n");
-    slowprint("*Test (4) : Generate one chunk with random payload size, malloc(), free() immediately, repeat 50 times.\n");
+    slowprint("*Test (4) : Generate random number of pointers, allocate array and store, shuffle array, free().\n");
     slowprint("*Test (5) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
     slowprint("*Test (6) : Allocate 120 1-byte pointers, writing to the payload some data. Then, iterates over the pointers ensuring that the data contains the same data as stored. If an overwrite occurs, this method halts and notifies as such.\n");
     slowprint("*Test (7) : Allocates 120 pointers and ensures that each pointer is a unique pointer (no duplicates). This is a test to ensure malloc() returns unique pointers.\n");
