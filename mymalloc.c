@@ -162,13 +162,8 @@ void print_mem() {
         printf("On address %p\n", data);
         printf("Usage : %d\n", data -> usage);
         printf("Payload Size  : %d\n", (int)(data -> size));
-        printf("Chunk Size : %d\n\n", (int)(data -> size) + (sizeof(meta_data)));
+        printf("Chunk Size : %lu\n\n", (int)(data -> size) + (sizeof(meta_data)));
         data = data -> next;
     }
     printf("-------------------------\n");
 }
-
-int leak() {
-    return ((char *)(SOM -> size + sizeof(meta_data)) != 8*MEMLENGTH) && SOM -> usage != FREE; //every chunk would be freed, hence, the SOM size would be the entire memory available
-}
-

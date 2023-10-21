@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "mymalloc.h"
 #include <sys/time.h>
+#include <time.h>
 #include <math.h>
 
 #include <stdio.h>
@@ -212,9 +213,10 @@ void test4() {
         total_test_time += (iteration_end - iteration_start);
     }
 
-    printf("Test time: %.2lf microseconds\n", (double)(total_test_time));
-    printf("Avg itme: %.2lf microseconds\n\n", (double)(total_test_time/50));
-    printf("---------------------------------------\n\n\n");
+    printf("+----------Test four results--------------------+\n");
+    printf("| Total Test time: %.2lf microseconds         |\n", (double)(total_test_time));
+    printf("| Average Time: %.2lf microseconds              |\n", (double)(total_test_time/50));
+    printf("+-----------------------------------------------+\n\n\n");
 
 }
 
@@ -373,9 +375,9 @@ void test7() {
     printf("|Average time : %.2lf microseconds       |\n", (double)(time)/50);
     printf("~---------------------------------------~\n");
 }
-/**
+
+/** DEPRECATED 
  * Slowly prints the given text to the terminal.
-*/
 void slowprint(char * text) {
     // int delay_ms = 100000;
     int delay_ms = 0;
@@ -387,6 +389,9 @@ void slowprint(char * text) {
 
     putchar('\n'); // Print a newline character at the end
 }
+
+*/
+
 /**
  * Performs the given test.
 */
@@ -405,24 +410,24 @@ void perform(int test) {
 
 int choose() {
     int choice = -1;
-    slowprint("*Select a test from the following:\n\n");
-    slowprint("*Test (1) : malloc() and immediately free() a 1-byte object, 120 times\n\n");
-    slowprint("*Test (2) : Use malloc() to get 120 1-byte objects, storing the pointers in an array, then use free() to deallocate the chunks\n\n");
-    slowprint("*Test (3) : Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects\n\n");
-    slowprint("*Test (4) : Generate random number of pointers, allocate array and store, shuffle array, free().\n");
-    slowprint("*Test (5) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
-    slowprint("*Test (6) : Allocate 120 1-byte pointers, writing to the payload some data. Then, iterates over the pointers ensuring that the data contains the same data as stored. If an overwrite occurs, this method halts and notifies as such.\n");
-    slowprint("*Test (7) : Allocates 120 pointers and ensures that each pointer is a unique pointer (no duplicates). This is a test to ensure malloc() returns unique pointers.\n");
+    printf("*Select a test from the following:\n\n");
+    printf("*Test (1) : malloc() and immediately free() a 1-byte object, 120 times\n\n");
+    printf("*Test (2) : Use malloc() to get 120 1-byte objects, storing the pointers in an array, then use free() to deallocate the chunks\n\n");
+    printf("*Test (3) : Create an array of 120 pointers. Repeatedly make a random choice between allocating a 1-byte object and adding the pointer to the array and deallocating a previously allocated object (if any), until you have allocated 120 times. Deallocate any remaining objects\n\n");
+    printf("*Test (4) : Generate random number of pointers, allocate array and store, shuffle array, free().\n");
+    printf("*Test (5) : Allocate until there is no more memory left. Then, randomly free the allocated pointers until all are freed.\n");
+    printf("*Test (6) : Allocate 120 1-byte pointers, writing to the payload some data. Then, iterates over the pointers ensuring that the data contains the same data as stored. If an overwrite occurs, this method halts and notifies as such.\n");
+    printf("*Test (7) : Allocates 120 pointers and ensures that each pointer is a unique pointer (no duplicates). This is a test to ensure malloc() returns unique pointers.\n");
 
-    slowprint("*Exit (0) : Exit the program\n\n");
-    slowprint("*Enter a number [0,7] :");
+    printf("*Exit (0) : Exit the program\n\n");
+    printf("*Enter a number [0,7] :");
     scanf("%d", &choice);
     return choice;
 
 }
 int main() {
     printf("~---------------------------------------------------------------------------~\n");
-    slowprint("Welcome to memgrind, the perfect place to test memory allocation functions!\n\n\n\n\n");
+    printf("Welcome to memgrind, the perfect place to test memory allocation functions!\n\n\n\n\n");
 
     int choice = choose();
     while(choice != END_PROGRAM) {
