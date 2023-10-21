@@ -21,6 +21,15 @@ long long current_microseconds() {
     long long microseconds = (long long)tv.tv_sec * 1000000 + tv.tv_usec;
     return microseconds;
 }
+
+/**
+ * Swaps the elements arr[i] and arr[j].
+*/
+void swap(int * arr, int i, int j) {
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
 /**
  * Malloc() and immediately free() a 1-byte object, 120 times
 */
@@ -210,6 +219,21 @@ void test4() {
 }
 
 /**
+ * Genereates unique integers in the range [0,size) == [0, size-1] and stores them in psedu-random locations within the array.
+*/
+void generate(int arr[], int size) {
+    for(int i = 0; i<size; i++) {
+        arr[i] = i;
+    }
+    //shuffle the array to randomize it
+    for(int i = 0; i<size; i++) {
+        int random1 = rand()%size;
+        int random2 = rand()%size;
+        swap(arr, random1, random2);
+    }
+}
+
+/**
  * Allocates and stores allocated pointers until malloc() fails, that is that all of memory has been consumed (allocates 16 bytes consistently -- memory will run out after 127 invocations).
  * 
  * Once alocation has completed, this method will then randomly deallocate/free pointers. Thus, this is a perforamnce test of free().
@@ -245,16 +269,6 @@ void test5() {
     printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
     printf("+---------------------------------------+\n");
 }
-
-
-/**
- * Swaps the elements arr[i] and arr[j].
-*/
-void swap(int * arr, int i, int j) {
-    int temp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = temp;
-}
 /**
  * Determines if the given array contains unique elements.
  * Returns true if so, otherwise returns false.
@@ -268,20 +282,6 @@ int unique(int * arr, int size) {
         }
     }
     return TRUE;
-}
-/**
- * Genereates unique integers in the range [0,size) == [0, size-1] and stores them in psedu-random locations within the array.
-*/
-void generate(int arr[], int size) {
-    for(int i = 0; i<size; i++) {
-        arr[i] = i;
-    }
-    //shuffle the array to randomize it
-    for(int i = 0; i<size; i++) {
-        int random1 = rand()%size;
-        int random2 = rand()%size;
-        swap(arr, random1, random2);
-    }
 } 
 void print(int * arr, int size) {
     for(int i = 0; i<size; i++) {
