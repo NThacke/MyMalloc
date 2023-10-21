@@ -416,7 +416,7 @@ int choose() {
     slowprint("*Test (7) : Allocates 120 pointers and ensures that each pointer is a unique pointer (no duplicates). This is a test to ensure malloc() returns unique pointers.\n");
 
     slowprint("*Exit (0) : Exit the program\n\n");
-    slowprint("*Enter a number [0,6] :");
+    slowprint("*Enter a number [0,7] :");
     scanf("%d", &choice);
     return choice;
 
