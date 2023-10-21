@@ -2,6 +2,7 @@ Readme
 
 Userinfo:
 
+nct36 - Nicholas Thacke
 dco43 - David Ontiveros
 
 Procedure to run code:
@@ -89,4 +90,19 @@ Test (5)
 
   **NOTE**
 
-  Test 5 is guaranteed to have malloc() fail (50 times). This is because the method is meant to run until malloc() fails. It is expected.
+  Test 5 is guaranteed to have malloc() fail (50 times). This is because the method is meant to run until malloc() fails. 
+  
+  Each iteration will allocate memory until malloc returns a null pointer (i.e., malloc failed). Thus, there will be 50 print statements denoting that malloc failed.
+
+
+**CORRECTNESS TESTING**
+
+Test (6)
+
+  This method will allocate 120 1 byte pointers, and populate the payload with an integer. 
+  
+  Then, this method will iterate over the pointers, ensuring that each payload contains the correct data.
+
+Test (7)
+
+  Allocates 120 pointers and tests to see if any of the pointers overlap / are the same pointer. This is a test of malloc() to see if malloc() successfully returns unique pointers (other than NULL).
