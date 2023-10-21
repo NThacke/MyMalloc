@@ -7,11 +7,6 @@
 #include <stdio.h>
 #include <unistd.h> // for usleep
 
-
-//TODO :: Implement test functions.
-
-//Malloc and free() seem to work as expected.
-
 #define END_PROGRAM 0
 
 #define TRUE 1
@@ -26,13 +21,9 @@ long long current_microseconds() {
     long long microseconds = (long long)tv.tv_sec * 1000000 + tv.tv_usec;
     return microseconds;
 }
-
-void test0() {
-    void * p = malloc(1);
-    print_mem();
-    free(p);
-    print_mem();
-}
+/**
+ * Malloc() and immediately free() a 1-byte object, 120 times
+*/
 void test1() {
     printf("~---------------------------------------~\n");
     printf("|                Test One               |\n");
@@ -51,7 +42,10 @@ void test1() {
     printf("|Average time : %.2lf microseconds       |\n", (double)(time)/50);
     printf("~---------------------------------------~\n");
 }
-
+/**
+ * Use malloc() to get 120 1-byte objects, storing the pointers in an array, 
+ * then use free() to deallocate the chunks
+*/
 void test2() {
     printf("~---------------------------------------~\n");
     printf("|                Test Two               |\n");
@@ -64,14 +58,12 @@ void test2() {
             void * p = malloc(1);
             arr[i] = p;    
         }
-        // print_mem();
         for(int i = 0; i<120; i++) {
             free(arr[i]);
         }
         long long end = current_microseconds();
         time += (end-start);
     }
-    // print_mem();
     printf("|Total time   : %.2lf microseconds      |\n", (double)time);
     printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
     printf("~---------------------------------------~\n");
@@ -117,44 +109,6 @@ int dealloc(void ** arr, int index) {
     }
     return index;
 }
-
-void dealloc_cheap(void ** arr, int index) {
-    for(int i = 0; i<index; i++) {
-        void * p = arr[i];
-        if(p != NULL) {
-            free(p);
-            arr[i] = NULL;
-        }
-    }
-}
-/**
- * Allocates arr[index] with a newly allocated pointer.
- * 
- * Returns index+1, that is, the new index to be allocated.
-*/
-int allocate(void ** arr, int index, int * allocations) {
-    void * p = malloc(1);
-    arr[index] = p;
-    index++;
-    (*allocations)++; //incremenet the number of allocations
-    return index;
-}
-/**
- * Deallocates arr[index] if arr[index] is available to be deallocated.
- * 
- * That is that arr[index] must not be null, and index must be larger than or equal to 0.
- * 
- * Note that this method performs no error checking.
- * 
- * Returns either index (if the pointer could not be deallocated, or that the given index is 0), or index-1 (if the pointer could be deallocated)
-*/
-int deallocate(void ** arr, int index) {
-    if(index >= 0 && arr[index] != NULL) {
-        free(arr[index]);
-        arr[index] = NULL;
-    }
-    return index;
-}
 /**
  * Fills the given array with the given size with NULL pointers.
 */
@@ -163,7 +117,14 @@ void nullify(void ** arr, int size) {
         arr[i] = NULL;
     }
 }
-void test_3() {
+/**
+ * Create an array of 120 pointers.
+ * Repeatedly make a random choice between allocating a 1-byte object and 
+ * adding the pointer to the array and deallocating a previously allocated 
+ * object (if any), until you have allocated 120 times. 
+ * Deallocate any remaining objects.
+*/
+void test3() {
     printf("+---------------------------------------+\n");
     printf("|               Test Three              |\n");
     printf("+---------------------------------------+\n");
@@ -197,50 +158,6 @@ void test_3() {
     printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
     printf("+---------------------------------------+\n");
 
-}
-void test3() {
-    void * arr [120];
-    nullify(arr, 120);
-    int index = 0;
-    int allocations = 0;
-
-    long long time = 0;
-    for(int i = 0; i<50; i++) {
-        long long start = current_microseconds();
-        while(allocations < 120) {
-            int random = rand()%2;
-            // printf("-----------\n");
-            // printf("Index : %d\n", index);
-            // printf("Allocations : %d\n", allocations);
-            // printf("-----------\n");
-            if(random == 0) {
-                index = allocate(arr, index, &allocations);
-            }
-            else {
-                index = deallocate(arr, index);
-            }
-        }
-        while(index >= 0) {
-            if(arr[index] != NULL) {
-                free(arr[index]);
-            }
-            index--;
-        }
-        long long end = current_microseconds();
-        time += (end - start);
-        // print_mem();
-    }
-    if(leak()) {
-        printf("Memory leak.\n");
-    }
-    else {
-        printf("No memory leak :)\n");
-    }
-    printf("|Total time   : %.2lf microseconds      |\n", (double)time);
-    printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
-    printf("~---------------------------------------~\n");
-
-    
 }
 
 /** 
@@ -293,83 +210,55 @@ void test4() {
 }
 
 /**
- * Allocates 16 bytes of memory until malloc() fails.
- * Then, randomly frees the allocated pointers. This is a test of coelscence.
- * We are skipping this performance test for now. dco43 has renamed the test for this
-
-
-void testCoelscence() {
-
-    printf("~---------------------------------------~\n");
-    printf("|               Test Four               |\n");
-    printf("|---------------------------------------|\n");
-
-    void * arr [128]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
-    void * p = malloc(24);
-    int i = 0;
-    while(p != NULL) {
-        arr[i] = p;
-        p = malloc(24);
-        i++;
-    }
-    print_mem();
-    i--; 
-    while(i >= 0) { //frees all of the allocated pointers
-        free(arr[i]);
-        i--;
-    }
-    print_mem();
-    printf("~---------------------------------------~\n");
-    
-}
-*/
-
-
-
-
-
-/**
- * Test five: Performance testing of free(). 
- * Generate 128 chunks and fill up memory
- * Generate array with 128 random numbers (this corresponds to index)
- * call free() and free on random index generated in previous step
+ * Allocates and stores allocated pointers until malloc() fails, that is that all of memory has been consumed (allocates 16 bytes consistently -- memory will run out after 127 invocations).
+ * 
+ * Once alocation has completed, this method will then randomly deallocate/free pointers. Thus, this is a perforamnce test of free().
+ * 
 */
 
 void test5() {
-    printf("~---------------------------------------~\n");
+    printf("+---------------------------------------+\n");
     printf("|               Test Five               |\n");
-    printf("|---------------------------------------|\n");
+    printf("+---------------------------------------+\n");
 
-    void * arr [127]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
-    void * p = malloc(16);
-    int i = 0;
-    while(p != NULL) {
-        printf("allocating at %d\n", i);
-        arr[i] = p;
-        p = malloc(16);
-        i++;
+    long long time = 0;
+    for(int k = 0; k<50; k++) {
+        void * arr [127]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
+        void * p = malloc(16);
+        int i = 0;
+        long long start = current_microseconds();
+        while(p != NULL) {
+            arr[i] = p;
+            p = malloc(16);
+            i++;
+        }
+        int random [127]; //have a random set of 128 numbers
+        generate(random, 127);
+        for(int j = 0; j<127; j++) {
+            void * p = arr[random[j]];
+            free(p);
+        }
+        long long end = current_microseconds();
+        time += (end-start);
     }
-    print_mem();
-    int random [127]; //have a random set of 128 numbers
-    generate(random, 127);
-    print(random, 127);
-    for(int j = 0; j<127; j++) {
-        printf("%d\n", j);
-        void * p = arr[random[j]];
-        free(p);
-    }
-
-    print_mem();
-    printf("~---------------------------------------~\n");
+    printf("|Total time   : %.2lf microseconds     |\n", (double)time);
+    printf("|Average time : %.2lf microseconds      |\n", (double)(time)/50);
+    printf("+---------------------------------------+\n");
 }
 
 
-
+/**
+ * Swaps the elements arr[i] and arr[j].
+*/
 void swap(int * arr, int i, int j) {
     int temp = arr[i];
     arr[i] = arr[j];
     arr[j] = temp;
 }
+/**
+ * Determines if the given array contains unique elements.
+ * Returns true if so, otherwise returns false.
+*/
 int unique(int * arr, int size) {
     for(int i = 0; i<size; i++){
         for(int j = i+1; j<size; j++) {
@@ -380,30 +269,18 @@ int unique(int * arr, int size) {
     }
     return TRUE;
 }
+/**
+ * Genereates unique integers in the range [0,size) == [0, size-1] and stores them in psedu-random locations within the array.
+*/
 void generate(int arr[], int size) {
     for(int i = 0; i<size; i++) {
         arr[i] = i;
-    }
-    print(arr, size);
-    if(unique(arr, size)) {
-        printf("Generated set is unique\n");
-    }
-    else {
-        printf("Generated set is not unique\n");
     }
     //shuffle the array to randomize it
     for(int i = 0; i<size; i++) {
         int random1 = rand()%size;
         int random2 = rand()%size;
         swap(arr, random1, random2);
-    }
-    print(arr, size);
-
-    if(unique(arr, size)) {
-        printf("Generated set is unique\n");
-    }
-    else {
-        printf("Generated set is not unique\n");
     }
 } 
 void print(int * arr, int size) {
@@ -518,7 +395,7 @@ void perform(int test) {
     switch(test) {
         case 1 : test1(); break;
         case 2 : test2(); break;
-        case 3 : test_3(); break;
+        case 3 : test3(); break;
         case 4 : test4(); break;
         case 5 : test5(); break;
         case 6 : test6(); break;
@@ -539,7 +416,7 @@ int choose() {
     slowprint("*Test (7) : Allocates 120 pointers and ensures that each pointer is a unique pointer (no duplicates). This is a test to ensure malloc() returns unique pointers.\n");
 
     slowprint("*Exit (0) : Exit the program\n\n");
-    slowprint("*Enter a number [0,6] :");
+    slowprint("*Enter a number [0,7] :");
     scanf("%d", &choice);
     return choice;
 
