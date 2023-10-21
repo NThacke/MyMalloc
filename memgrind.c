@@ -373,9 +373,9 @@ void test7() {
     printf("|Average time : %.2lf microseconds       |\n", (double)(time)/50);
     printf("~---------------------------------------~\n");
 }
-/**
+
+/** DEPRECATED 
  * Slowly prints the given text to the terminal.
-*/
 void slowprint(char * text) {
     // int delay_ms = 100000;
     int delay_ms = 0;
@@ -387,6 +387,9 @@ void slowprint(char * text) {
 
     putchar('\n'); // Print a newline character at the end
 }
+
+*/
+
 /**
  * Performs the given test.
 */
