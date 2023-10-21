@@ -395,7 +395,7 @@ void perform(int test) {
     switch(test) {
         case 1 : test1(); break;
         case 2 : test2(); break;
-        case 3 : test_3(); break;
+        case 3 : test3(); break;
         case 4 : test4(); break;
         case 5 : test5(); break;
         case 6 : test6(); break;
