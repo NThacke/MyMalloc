@@ -86,3 +86,7 @@ Test (5)
 
   *This also implies that the largest allocation request is 4064. A request of 4080 would be denied, as doing so would leave the tail end to be a non-meta block. The library forbids this.
 
+
+  **NOTE**
+
+  Test 5 is guaranteed to have malloc() fail (50 times). This is because the method is meant to run until malloc() fails. It is expected.
