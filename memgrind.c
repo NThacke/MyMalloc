@@ -340,19 +340,21 @@ void test5() {
     printf("|               Test Five               |\n");
     printf("|---------------------------------------|\n");
 
-    void * arr [128]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
-    void * p = malloc(24);
+    void * arr [127]; //128 chunks of 32 bytes (16 for meta data + 16 for size) fits within 4096 bytes
+    void * p = malloc(16);
     int i = 0;
     while(p != NULL) {
+        printf("allocating at %d\n", i);
         arr[i] = p;
-        p = malloc(24);
+        p = malloc(16);
         i++;
     }
     print_mem();
-    int random [128]; //have a random set of 128 numbers
-    generate(random, 128);
-    print(random, 128);
-    for(int j = 0; j<128; j++) {
+    int random [127]; //have a random set of 128 numbers
+    generate(random, 127);
+    print(random, 127);
+    for(int j = 0; j<127; j++) {
+        printf("%d\n", j);
         void * p = arr[random[j]];
         free(p);
     }
