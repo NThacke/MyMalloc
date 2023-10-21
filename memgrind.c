@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "mymalloc.h"
 #include <sys/time.h>
+#include <time.h>
 #include <math.h>
 
 #include <stdio.h>
