@@ -213,9 +213,10 @@ void test4() {
         total_test_time += (iteration_end - iteration_start);
     }
 
-    printf("Test time: %.2lf microseconds\n", (double)(total_test_time));
-    printf("Avg itme: %.2lf microseconds\n\n", (double)(total_test_time/50));
-    printf("---------------------------------------\n\n\n");
+    printf("+----------Test four results--------------------+\n");
+    printf("| Total Test time: %.2lf microseconds         |\n", (double)(total_test_time));
+    printf("| Average Time: %.2lf microseconds              |\n", (double)(total_test_time/50));
+    printf("+-----------------------------------------------+\n\n\n");
 
 }
 
